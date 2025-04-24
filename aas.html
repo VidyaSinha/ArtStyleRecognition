@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Set Cookie</title>
+</head>
+<body>
+ <!-- <h1>Welcome, Vidya !</h1> -->
+Invalid username or password. Try again.
+   <br> <a href="login.html">logout</a><br><br> 
+   
+   
+   <label>Enter Value:</label>
+    <input type="text" id="myInput">
+    <button onclick="setCookie()">Set Cookie</button>
+    
+
+    <script>
+        function setCookie() {
+            var value = document.getElementById("myInput").value;
+            document.cookie = "username=" + value + "; path=/";
+            alert("Cookie has been set!");
+        }
+    </script>
+
+</body>
+</html>

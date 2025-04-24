@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 33% 98%;
+    --foreground: 274 16% 19%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 274 16% 19%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 274 16% 19%;
+
+    --primary: 257 82% 74%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 257 30% 54%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 260 33% 94%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 256 40% 96%;
+    --accent-foreground: 257 30% 54%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 257 82% 74%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Slightly lighter dark background */
+    --background: 274 16% 19%;
+    /* Brighter foreground text */
+    --foreground: 260 33% 95%;
+
+    --card: 274 16% 22%;
+    --card-foreground: 260 33% 98%;
+
+    --popover: 274 16% 22%;
+    --popover-foreground: 260 33% 98%;
+
+    --primary: 257 82% 74%;
+    --primary-foreground: 274 16% 19%;
+
+    --secondary: 257 30% 54%;
+    --secondary-foreground: 260 33% 98%;
+
+    --muted: 274 16% 28%;
+    /* Lighter muted text */
+    --muted-foreground: 260 33% 75%;
+
+    --accent: 257 30% 30%;
+    --accent-foreground: 260 33% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 260 33% 98%;
+
+    --border: 274 16% 28%;
+    --input: 274 16% 28%;
+    --ring: 257 82% 74%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  .dark body {
+    color: hsl(260, 33%, 95%); /* Ensure overall text is light in dark mode */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif dark:text-white;
+  }
+
+  p, a, button, span, li {
+    @apply font-sans dark:text-gray-300;
+  }
+}
+
+/* Custom styles for file upload */
+.file-upload-container {
+  transition: all 0.3s ease;
+}
+
+.file-upload-container:hover {
+  background-color: rgba(155, 135, 245, 0.05);
+}
+
+/* Art style card effects */
+.art-style-card {
+  transition: all 0.3s ease;
+}
+
+.art-style-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px -10px rgba(155, 135, 245, 0.2);
+}
