@@ -35,9 +35,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    console.log('File input change detected');
     
     if (e.target.files && e.target.files[0]) {
+      console.log('File selected:', e.target.files[0].name);
       handleFile(e.target.files[0]);
+    } else {
+      console.log('No file selected or file selection canceled');
     }
   };
   
@@ -91,17 +95,24 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
                 Supports JPG, PNG, and other image formats
               </p>
             </div>
-            <label className="cursor-pointer">
-              <Button variant="outline">
-                Browse Files
-              </Button>
-              <input 
-                type="file" 
-                className="hidden" 
-                onChange={handleChange}
-                accept="image/*" 
-              />
-            </label>
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              type="button"
+              onClick={() => {
+                const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+                if (fileInput) fileInput.click();
+              }}
+            >
+              Browse Files
+            </Button>
+            <input 
+              id="file-upload"
+              type="file" 
+              className="hidden" 
+              onChange={handleChange}
+              accept="image/*" 
+            />
           </div>
         </div>
       ) : (

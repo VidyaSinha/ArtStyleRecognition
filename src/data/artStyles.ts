@@ -17,7 +17,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Claude Monet", "Edgar Degas", "Pierre-Auguste Renoir", "Camille Pissarro"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+    exampleImageUrl: "/impressionism.webp",
     importance: "Impressionism marked a revolutionary break with academic painting traditions, paving the way for modern art movements by emphasizing the artist's perception rather than strict realism."
   },
   {
@@ -35,7 +35,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Pablo Picasso", "Georges Braque", "Juan Gris", "Fernand Léger"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1486718448742-163732cd1544",
+    exampleImageUrl: "/cubism.webp",
     importance: "Cubism revolutionized European art by introducing multiple viewpoints simultaneously, breaking from traditional perspective and paving the way for abstract art forms."
   },
   {
@@ -53,7 +53,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Salvador Dalí", "René Magritte", "Max Ernst", "Joan Miró"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb",
+    exampleImageUrl: "/surrealism.webp",
     importance: "Surrealism explored the unconscious mind and dream imagery, profoundly influencing visual art, literature, film, and music throughout the 20th century."
   },
   {
@@ -71,7 +71,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Wassily Kandinsky", "Piet Mondrian", "Kazimir Malevich", "Jackson Pollock"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+    exampleImageUrl: "/abstract.webp",
     importance: "Abstract art freed artists from the constraints of representing visible reality, allowing direct expression of emotions and ideas through pure form, color, and line."
   },
   {
@@ -89,7 +89,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Andy Warhol", "Roy Lichtenstein", "Richard Hamilton", "Claes Oldenburg"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+    exampleImageUrl: "/pop.webp",
     importance: "Pop Art blurred the boundaries between 'high' and 'low' culture, celebrating mass-produced commercial culture and permanently changing the relationship between art and popular culture."
   },
   {
@@ -143,7 +143,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Alphonse Mucha", "Gustav Klimt", "Antoni Gaudí", "Louis Comfort Tiffany"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1558403871-bb6e8113a32e",
+    exampleImageUrl: "/art-nouveau.webp",
     importance: "Art Nouveau bridged the gap between fine and applied arts, influencing architecture, furniture, jewelry, and graphic design with its organic aesthetics."
   },
   {
@@ -161,7 +161,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Caravaggio", "Rembrandt", "Peter Paul Rubens", "Gian Lorenzo Bernini"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1577720643272-265f4a8896f6",
+    exampleImageUrl: "baroque.webp",
     importance: "Baroque art expressed the triumph of the Catholic Church and absolute monarchies through emotional intensity, dynamism, and theatrical effects."
   },
   {
@@ -179,7 +179,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Edvard Munch", "Ernst Ludwig Kirchner", "Emil Nolde", "Egon Schiele"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1586073359592-8c48f4548f84",
+    exampleImageUrl: "expressionism.webp",
     importance: "Expressionism prioritized emotional truth over physical reality, influencing numerous 20th-century art movements and providing a means to process societal trauma."
   },
   {
@@ -197,7 +197,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Vincent van Gogh", "Paul Cézanne", "Paul Gauguin", "Georges Seurat"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1541680670548-88e8cd23c0f4",
+    exampleImageUrl: "post-impressionism.webp",
     importance: "Post-Impressionism expanded the boundaries set by Impressionism, providing a foundation for the revolutionary art movements of the 20th century through personal expression and formal innovation."
   },
   {
@@ -233,7 +233,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Marcel Duchamp", "Man Ray", "Hannah Höch", "Kurt Schwitters"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1573521193826-58c7dc2e13e3",
+    exampleImageUrl: "dadaism.webp",
     importance: "Dadaism challenged conventional definitions of art, pioneering techniques like collage, photomontage, and readymades that profoundly influenced later avant-garde movements."
   },
   {
@@ -251,7 +251,7 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Banksy", "Jean-Michel Basquiat", "Keith Haring", "Shepard Fairey"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1511306404404-ad607bd7c601",
+    exampleImageUrl: "streetart.webp",
     importance: "Street art democratized art by bringing it directly to the public, addressing social and political issues while challenging traditional art institutions and ownership."
   },
   {
@@ -269,27 +269,22 @@ export const artStyles: ArtStyle[] = [
     exampleArtists: [
       "Walter Gropius", "Wassily Kandinsky", "Paul Klee", "László Moholy-Nagy"
     ],
-    exampleImageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e",
+    exampleImageUrl: "bauhaus.webp",
     importance: "Bauhaus revolutionized design education and practice, merging fine arts with crafts and laying foundations for modernist architecture, graphic design, and industrial design."
   }
 ];
 
 // Mock function for AI analysis - in a real app, this would be a call to an AI model
-export const analyzeArtStyle = (imageFile: File): Promise<{ styleMatches: { name: string, confidence: number }[] }> => {
-  return new Promise((resolve) => {
-    // Simulate API call delay
-    setTimeout(() => {
-      // This is a mock response - in a real app, this would be the result from an actual AI analysis
-      const mockResult = {
-        styleMatches: [
-          { name: "Impressionism", confidence: 0.78 },
-          { name: "Abstract", confidence: 0.45 },
-          { name: "Cubism", confidence: 0.32 },
-          { name: "Pop Art", confidence: 0.21 },
-          { name: "Surrealism", confidence: 0.15 }
-        ]
-      };
-      resolve(mockResult);
-    }, 2500);
-  });
+import classifier from '../lib/artStyleClassifier';
+
+export const analyzeArtStyle = async (imageFile: File): Promise<{ styleMatches: { name: string, confidence: number }[] }> => {
+  try {
+    // Get predictions from the Flask server
+    const styleMatches = await classifier.predictStyle(imageFile);
+    
+    return { styleMatches };
+  } catch (error) {
+    console.error('Error analyzing art style:', error);
+    throw error;
+  }
 };

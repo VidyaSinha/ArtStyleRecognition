@@ -65,7 +65,7 @@ const Index = () => {
               Find Your Art Style
             </h1>
             <p className="text-lg text-muted-foreground dark:text-gray-300 max-w-2xl animate-fade-up" style={{ animationDelay: '100ms' }}>
-              Upload your artwork and discover which artistic styles it resembles. Our AI will analyze your image 
+              Upload your artwork and discover which artistic styles it resembles. This AI will analyze your image 
               and reveal the art movements that best capture its essence.
             </p>
           </div>
@@ -149,7 +149,7 @@ const Index = () => {
         </div>
         
         <footer className="mt-20 text-center text-sm text-muted-foreground">
-          <p>Artistic Eye AI &copy; {new Date().getFullYear()} | Discover the artistic styles in your images</p>
+          <p>Art Style Recognizer &copy; {new Date().getFullYear()} | Discover the art styles in your images | Made By Vidya Sinha</p>
         </footer>
       </div>
     </div>
