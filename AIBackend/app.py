@@ -7,12 +7,16 @@ import tensorflow as tf
 import io
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging for production
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS for production
+CORS(app, resources={r"/*": {"origins": ["https://artstylerecognition.onrender.com"]}})
 
 # Get absolute paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -98,15 +102,44 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Configure Flask app for production
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit upload size to 16MB
+app.config['PROPAGATE_EXCEPTIONS'] = True  # Enable better error propagation
+app.config['ENV'] = 'production'
+app.config['DEBUG'] = False
+
 if __name__ == '__main__':
-    # Configure Flask app
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit upload size to 16MB
-    app.config['PROPAGATE_EXCEPTIONS'] = True  # Enable better error propagation
-    
-    # Run the Flask app
+    # Run the Flask app with production server
     try:
-        print("Starting Flask server...")
-        app.run(host='0.0.0.0', port=3000, debug=True)
+        port = int(os.environ.get('PORT', 8000))
+        logger.info(f"Starting production server on port {port}...")
+        from gunicorn.app.base import BaseApplication
+
+        class StandaloneApplication(BaseApplication):
+            def __init__(self, app, options=None):
+                self.options = options or {}
+                self.application = app
+                super().__init__()
+
+            def load_config(self):
+                for key, value in self.options.items():
+                    if key in self.cfg.settings and value is not None:
+                        self.cfg.set(key, value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            'bind': f'0.0.0.0:{port}',
+            'workers': 1,  # Single worker due to memory constraints
+            'timeout': 120,
+            'worker_class': 'sync',
+            'preload_app': True,
+            'accesslog': '-',
+            'errorlog': '-'
+        }
+
+        StandaloneApplication(app, options).run()
     except Exception as e:
-        print(f"Failed to start Flask server: {str(e)}")
+        logger.error(f"Failed to start server: {str(e)}")
         raise
