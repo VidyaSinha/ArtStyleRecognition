@@ -14,10 +14,16 @@ class ArtStyleClassifier {
       const response = await fetch(`${this.apiUrl}/predict`, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
+        mode: 'cors'
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text().catch(() => 'No error details available');
+        throw new Error(`Server error (${response.status}): ${errorText}`);
       }
 
       const predictions = await response.json();

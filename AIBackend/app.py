@@ -16,7 +16,13 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 # Configure CORS for both development and production
-CORS(app, resources={r"/*": {"origins": ["https://artstylerecognition.onrender.com", "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "http://127.0.0.1:3000"]}}, supports_credentials=True)
+cors = CORS(app, resources={r"/*": {
+    "origins": ["https://artstylerecognition.onrender.com", "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "http://127.0.0.1:3000"],
+    "methods": ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type"],
+    "expose_headers": ["Content-Type"],
+    "supports_credentials": True
+}})
 
 # Get absolute paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,8 +76,12 @@ def preprocess_image(image_bytes):
         raise ValueError(f"Error preprocessing image: {str(e)}")
 
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = app.make_default_options_response()
+        return response
     try:
         if 'image' not in request.files:
             return jsonify({'error': 'No image file provided'}), 400
@@ -109,37 +119,43 @@ app.config['ENV'] = 'production'
 app.config['DEBUG'] = False
 
 if __name__ == '__main__':
-    # Run the Flask app with production server
     try:
         port = int(os.environ.get('PORT', 8000))
-        logger.info(f"Starting production server on port {port}...")
-        from gunicorn.app.base import BaseApplication
+        # Check if running on Windows
+        if os.name == 'nt':
+            logger.info(f"Starting development server on Windows on port {port}...")
+            # Use Flask's built-in server for Windows development
+            app.run(host='0.0.0.0', port=port, debug=False)
+        else:
+            # Use Gunicorn for Unix systems (production)
+            logger.info(f"Starting production server on port {port}...")
+            from gunicorn.app.base import BaseApplication
 
-        class StandaloneApplication(BaseApplication):
-            def __init__(self, app, options=None):
-                self.options = options or {}
-                self.application = app
-                super().__init__()
+            class StandaloneApplication(BaseApplication):
+                def __init__(self, app, options=None):
+                    self.options = options or {}
+                    self.application = app
+                    super().__init__()
 
-            def load_config(self):
-                for key, value in self.options.items():
-                    if key in self.cfg.settings and value is not None:
-                        self.cfg.set(key, value)
+                def load_config(self):
+                    for key, value in self.options.items():
+                        if key in self.cfg.settings and value is not None:
+                            self.cfg.set(key, value)
 
-            def load(self):
-                return self.application
+                def load(self):
+                    return self.application
 
-        options = {
-            'bind': f'0.0.0.0:{port}',
-            'workers': 1,  # Single worker due to memory constraints
-            'timeout': 120,
-            'worker_class': 'sync',
-            'preload_app': True,
-            'accesslog': '-',
-            'errorlog': '-'
-        }
+            options = {
+                'bind': f'0.0.0.0:{port}',
+                'workers': 1,  # Single worker due to memory constraints
+                'timeout': 120,
+                'worker_class': 'sync',
+                'preload_app': True,
+                'accesslog': '-',
+                'errorlog': '-'
+            }
 
-        StandaloneApplication(app, options).run()
+            StandaloneApplication(app, options).run()
     except Exception as e:
         logger.error(f"Failed to start server: {str(e)}")
         raise
