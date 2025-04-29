@@ -15,8 +15,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# Configure CORS for production
-CORS(app, resources={r"/*": {"origins": ["https://artstylerecognition.onrender.com"]}})
+# Configure CORS for both development and production
+CORS(app, resources={r"/*": {"origins": ["https://artstylerecognition.onrender.com", "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "http://127.0.0.1:3000"]}}, supports_credentials=True)
 
 # Get absolute paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
