@@ -4,5 +4,6 @@ pillow==10.1.0
 numpy==1.26.2
 tensorflow==2.15.0
 gunicorn==21.2.0
-scikit-image
-scipy
+scikit-image==0.22.0
+scipy==1.12.0
+h5py==3.10.0
