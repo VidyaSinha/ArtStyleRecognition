@@ -36,34 +36,48 @@ class_labels = None
 def initialize_model():
     global model, class_labels
     try:
-        # Check if model and class label files exist
-        if not os.path.exists(model_path):
-            logger.error(f"Model file not found at {model_path}")
+        # Check if files exist
+        weights_path = os.path.join(base_dir, 'model_weights_BetterDA.weights.h5')
+        if not os.path.exists(weights_path):
+            logger.error(f"Model weights file not found at {weights_path}")
             return False
         if not os.path.exists(class_labels_path):
             logger.error(f"Class labels file not found at {class_labels_path}")
             return False
 
         logger.info("Initializing TensorFlow...")
-        # Configure TensorFlow to use CPU only and optimize memory usage
+        # Configure TensorFlow to use CPU
         tf.config.set_visible_devices([], 'GPU')
         tf.config.threading.set_intra_op_parallelism_threads(1)
         tf.config.threading.set_inter_op_parallelism_threads(1)
 
-        logger.info(f"Loading model from {model_path}...")
+        # Recreate the model architecture
+        logger.info("Creating model architecture...")
         try:
-            model = tf.keras.models.load_model(model_path, compile=False, custom_objects=None, safe_mode=False)
-            logger.info("Model loaded successfully")
-        except Exception as model_error:
-            logger.error(f"Failed to load model: {str(model_error)}")
-            return False
-
-        logger.info(f"Loading class labels from {class_labels_path}...")
-        try:
+            # Use MobileNetV2 as base (adjust if you used a different architecture)
+            from tensorflow.keras.applications import MobileNetV2
+            from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+            from tensorflow.keras.models import Model
+            
+            # Create base model
+            base_model = MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights=None)
+            x = GlobalAveragePooling2D()(base_model.output)
+            
+            # Get number of classes from the labels file
             class_labels = np.load(class_labels_path)
-            logger.info("Class labels loaded successfully")
-        except Exception as labels_error:
-            logger.error(f"Failed to load class labels: {str(labels_error)}")
+            num_classes = len(class_labels)
+            
+            # Add classification layer
+            predictions = Dense(num_classes, activation='softmax')(x)
+            model = Model(inputs=base_model.input, outputs=predictions)
+            
+            # Load weights
+            logger.info(f"Loading weights from {weights_path}...")
+            model.load_weights(weights_path)
+            logger.info("Weights loaded successfully")
+            
+        except Exception as model_error:
+            logger.error(f"Failed to create model and load weights: {str(model_error)}")
             return False
 
         return True
