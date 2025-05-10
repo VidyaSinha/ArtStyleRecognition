@@ -52,7 +52,7 @@ def initialize_model():
 
         logger.info(f"Loading model from {model_path}...")
         try:
-            model = tf.keras.models.load_model(model_path, compile=False)
+            model = tf.keras.models.load_model(model_path, compile=False, custom_objects=None, safe_mode=False)
             logger.info("Model loaded successfully")
         except Exception as model_error:
             logger.error(f"Failed to load model: {str(model_error)}")
