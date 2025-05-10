@@ -4,3 +4,5 @@ pillow==10.1.0
 numpy==1.26.2
 tensorflow==2.15.0
 gunicorn==21.2.0
+scikit-image
+scipy

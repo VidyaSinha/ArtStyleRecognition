@@ -86,16 +86,50 @@ def preprocess_image(image_bytes):
         # Resize the image to match model's expected input size
         image = image.resize((224, 224), Image.Resampling.LANCZOS)
         
-        # Convert to numpy array and preprocess
+        # Convert to numpy array for processing
         img_array = np.array(image)
-        img_array = img_array.astype('float32') / 255.0  # Normalize to [0,1]
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        
+        # Calculate HOG features
+        from skimage.feature import hog
+        hog_features = hog(img_array, orientations=8, pixels_per_cell=(16, 16),
+                          cells_per_block=(1, 1), channel_axis=-1)
+        
+        # Calculate color moments
+        def color_moments(img):
+            # Convert to float for calculations
+            img = img.astype('float32')
+            
+            # Calculate moments for each channel
+            means = np.mean(img, axis=(0,1))
+            stds = np.std(img, axis=(0,1))
+            skews = np.mean((img - means) ** 3, axis=(0,1))
+            
+            # Normalize moments
+            means = means / 255.0
+            stds = stds / 255.0
+            skews = skews / (255.0 ** 3)
+            
+            return np.concatenate([means, stds, skews])
+        
+        color_features = color_moments(img_array)
+        
+        # Calculate gradient magnitude
+        from scipy.ndimage import sobel
+        gradient_x = sobel(img_array, axis=0, mode='constant')
+        gradient_y = sobel(img_array, axis=1, mode='constant')
+        gradient_magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+        
+        # Normalize the image
+        img_array = img_array.astype('float32') / 255.0
+        
+        # Add batch dimension
+        img_array = np.expand_dims(img_array, axis=0)
         
         # Validate input shape
         if img_array.shape != (1, 224, 224, 3):
             raise ValueError(f"Invalid input shape: {img_array.shape}. Expected: (1, 224, 224, 3)")
         
-        return img_array
+        return img_array, hog_features, color_features, gradient_magnitude
     except Exception as e:
         raise ValueError(f"Error preprocessing image: {str(e)}")
 

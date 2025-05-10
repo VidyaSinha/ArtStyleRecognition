@@ -4,7 +4,7 @@ interface StylePrediction {
 }
 
 class ArtStyleClassifier {
-  private apiUrl = 'https://artstylerecognition.onrender.com'; // Flask server URL
+  private apiUrl = 'http://127.0.0.1:8000'; // Flask server URL
 
   async predictStyle(imageFile: File): Promise<StylePrediction[]> {
     try {
