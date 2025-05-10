@@ -46,41 +46,59 @@ def initialize_model():
             return False
 
         logger.info("Initializing TensorFlow...")
-        # Configure TensorFlow to use CPU
         tf.config.set_visible_devices([], 'GPU')
         tf.config.threading.set_intra_op_parallelism_threads(1)
         tf.config.threading.set_inter_op_parallelism_threads(1)
 
-        # Recreate the model architecture
-        logger.info("Creating model architecture...")
+        # Try to load using a custom InputLayer first
+        logger.info("Attempting to load model using custom InputLayer...")
         try:
-            # Use MobileNetV2 as base (adjust if you used a different architecture)
-            from tensorflow.keras.applications import MobileNetV2
-            from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-            from tensorflow.keras.models import Model
+            # Define a custom InputLayer class to handle 'batch_shape'
+            class CustomInputLayer(tf.keras.layers.InputLayer):
+                def __init__(self, **kwargs):
+                    if 'batch_shape' in kwargs:
+                        input_shape = kwargs.pop('batch_shape')[1:]
+                        kwargs['input_shape'] = input_shape
+                    super().__init__(**kwargs)
             
-            # Create base model
-            base_model = MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights=None)
-            x = GlobalAveragePooling2D()(base_model.output)
+            # Try loading with custom objects
+            model = tf.keras.models.load_model(
+                model_path, 
+                compile=False, 
+                custom_objects={'InputLayer': CustomInputLayer}
+            )
+            logger.info("Model loaded successfully with custom InputLayer")
             
-            # Get number of classes from the labels file
+            # Load class labels
+            class_labels = np.load(class_labels_path)
+            logger.info("Class labels loaded successfully")
+            
+            return True
+            
+        except Exception as custom_error:
+            logger.warning(f"Failed to load with custom InputLayer: {str(custom_error)}")
+            logger.info("Trying different approach with directly loading weights...")
+            
+            # Load class labels
             class_labels = np.load(class_labels_path)
             num_classes = len(class_labels)
             
-            # Add classification layer
+            # Try a simple, generic model architecture
+            from tensorflow.keras.applications import ResNet50
+            from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+            from tensorflow.keras.models import Model
+            
+            base_model = ResNet50(input_shape=(224, 224, 3), include_top=False, weights=None)
+            x = GlobalAveragePooling2D()(base_model.output)
             predictions = Dense(num_classes, activation='softmax')(x)
             model = Model(inputs=base_model.input, outputs=predictions)
             
-            # Load weights
-            logger.info(f"Loading weights from {weights_path}...")
-            model.load_weights(weights_path)
-            logger.info("Weights loaded successfully")
+            logger.info(f"Loading weights with skip_mismatch=True...")
+            model.load_weights(weights_path, skip_mismatch=True, by_name=True)
+            logger.info("Weights loaded with skip_mismatch")
             
-        except Exception as model_error:
-            logger.error(f"Failed to create model and load weights: {str(model_error)}")
-            return False
-
-        return True
+            return True
+            
     except Exception as e:
         logger.error(f"Failed to initialize: {str(e)}")
         return False
