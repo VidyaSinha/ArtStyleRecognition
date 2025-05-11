@@ -17,7 +17,11 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 # Configure CORS for both development and production
 cors = CORS(app, resources={r"/*": {
-    "origins": ["https://artstylerecognition.onrender.com", "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "http://127.0.0.1:3000"],
+    "origins": [
+        r"http://localhost:\d+", 
+        r"http://127\.0\.0\.1:\d+", 
+        "https://artstylerecognition.onrender.com"
+    ],
     "methods": ["GET", "POST", "OPTIONS"],
     "allow_headers": ["Content-Type"],
     "expose_headers": ["Content-Type"],
@@ -161,7 +165,7 @@ def preprocess_image(image_bytes):
         if img_array.shape != (1, 224, 224, 3):
             raise ValueError(f"Invalid input shape: {img_array.shape}. Expected: (1, 224, 224, 3)")
         
-        return img_array, hog_features, color_features, gradient_magnitude
+        return img_array # Return only the processed image array
     except Exception as e:
         raise ValueError(f"Error preprocessing image: {str(e)}")
 
