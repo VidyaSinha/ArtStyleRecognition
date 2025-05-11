@@ -222,9 +222,11 @@ app.config['DEBUG'] = False
 
 if __name__ == '__main__':
     try:
+        # Get port from environment variable or use 8000 as default
         port = int(os.environ.get('PORT', 8000))
         logger.info(f"Starting server on port {port}...")
-        app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
+        # Make sure to bind to 0.0.0.0 to accept all incoming connections
+        app.run(host='0.0.0.0', port=port, debug=False)
     except Exception as e:
         logger.error(f"Failed to start server: {str(e)}")
         raise
