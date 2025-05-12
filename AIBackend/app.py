@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import io
 import logging
+import time
 
 # Configure logging for production
 logging.basicConfig(
@@ -112,6 +113,9 @@ initialize_model()
 
 def preprocess_image(image_bytes):
     try:
+        start_time = time.time()
+        logger.info("Starting image preprocessing...")
+        
         # Open the image using PIL
         image = Image.open(io.BytesIO(image_bytes))
         
@@ -122,41 +126,8 @@ def preprocess_image(image_bytes):
         # Resize the image to match model's expected input size
         image = image.resize((224, 224), Image.Resampling.LANCZOS)
         
-        # Convert to numpy array for processing
-        img_array = np.array(image)
-        
-        # Calculate HOG features
-        from skimage.feature import hog
-        hog_features = hog(img_array, orientations=8, pixels_per_cell=(16, 16),
-                          cells_per_block=(1, 1), channel_axis=-1)
-        
-        # Calculate color moments
-        def color_moments(img):
-            # Convert to float for calculations
-            img = img.astype('float32')
-            
-            # Calculate moments for each channel
-            means = np.mean(img, axis=(0,1))
-            stds = np.std(img, axis=(0,1))
-            skews = np.mean((img - means) ** 3, axis=(0,1))
-            
-            # Normalize moments
-            means = means / 255.0
-            stds = stds / 255.0
-            skews = skews / (255.0 ** 3)
-            
-            return np.concatenate([means, stds, skews])
-        
-        color_features = color_moments(img_array)
-        
-        # Calculate gradient magnitude
-        from scipy.ndimage import sobel
-        gradient_x = sobel(img_array, axis=0, mode='constant')
-        gradient_y = sobel(img_array, axis=1, mode='constant')
-        gradient_magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
-        
-        # Normalize the image
-        img_array = img_array.astype('float32') / 255.0
+        # Convert to numpy array and normalize in one step
+        img_array = np.array(image, dtype='float32') / 255.0
         
         # Add batch dimension
         img_array = np.expand_dims(img_array, axis=0)
@@ -165,8 +136,10 @@ def preprocess_image(image_bytes):
         if img_array.shape != (1, 224, 224, 3):
             raise ValueError(f"Invalid input shape: {img_array.shape}. Expected: (1, 224, 224, 3)")
         
-        return img_array # Return only the processed image array
+        logger.info(f"Image preprocessing completed in {time.time() - start_time:.2f} seconds")
+        return img_array
     except Exception as e:
+        logger.error(f"Error preprocessing image: {str(e)}")
         raise ValueError(f"Error preprocessing image: {str(e)}")
 
 
@@ -181,25 +154,32 @@ def health_check():
 def predict():
     global model, class_labels
     if request.method == 'OPTIONS':
-        # Handle preflight request
         response = app.make_default_options_response()
         return response
 
+    start_time = time.time()
+    logger.info("Received prediction request")
+
     # Check if model is initialized
     if model is None or class_labels is None:
+        logger.error("Model not initialized")
         return jsonify({'error': 'Model not initialized. Please try again later.'}), 503
+    
     try:
         if 'image' not in request.files:
+            logger.error("No image file provided")
             return jsonify({'error': 'No image file provided'}), 400
 
         image_file = request.files['image']
         image_bytes = image_file.read()
         
         # Preprocess the image
+        logger.info("Starting image preprocessing")
         processed_image = preprocess_image(image_bytes)
         
         # Make prediction
-        predictions = model.predict(processed_image)
+        logger.info("Starting model prediction")
+        predictions = model.predict(processed_image, verbose=0)  # Disable TensorFlow progress bar
         
         # Get top 5 predictions
         top_indices = np.argsort(predictions[0])[-5:][::-1]
@@ -213,9 +193,11 @@ def predict():
             for idx in top_indices
         ]
         
+        logger.info(f"Prediction completed in {time.time() - start_time:.2f} seconds")
         return jsonify(results)
 
     except Exception as e:
+        logger.error(f"Error during prediction: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # Configure Flask app for production
