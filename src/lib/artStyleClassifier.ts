@@ -4,7 +4,7 @@ interface StylePrediction {
 }
 
 class ArtStyleClassifier {
-  private apiUrl = 'https://artstylerecognition.onrender.com'; // Render deployment URL
+  private apiUrl = 'https://huggingface.co/spaces/VidyaSinha/Artstylerecog'; // Render deployment URL
   private readonly TIMEOUT_MS = 30000; // 30 second timeout
 
   async predictStyle(imageFile: File): Promise<StylePrediction[]> {
