@@ -23,3 +23,7 @@ This application uses deep learning to recognize art styles in images. It combin
 ## Environment Variables
 - `PORT`: Server port (default: 7860)
 - `FLASK_ENV`: Environment mode (production/development)
+
+
+## UI:
+![image](https://github.com/user-attachments/assets/8566a00b-447d-4439-83c3-c861a4dc04c8)
